@@ -1,4 +1,5 @@
 # Ring Learning with Errors
+OneDrive Link: https://entuedu-my.sharepoint.com/:f:/g/personal/harshrao001_e_ntu_edu_sg/EvQELUQXQJlJnn8FCg5uaWoBtftpHCzTArrEIYMPpRtvXA?email=RAHUL020%40e.ntu.edu.sg&e=nCkFte
 
 ### TODO
 1. Introduce Learning with errors (LWE) - Theory
