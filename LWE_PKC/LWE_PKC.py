@@ -7,7 +7,7 @@ class LWE_Encrypt():
         self.A_list = np.array(A_list)
         self.T_list = np.array(T_list)
         self.q = q
-        self.max_error = np.array(max_error)
+        self.max_error = max_error
         self.n = len(A_list[0])
 
     def encrypt_bit(self, message: int):
@@ -16,13 +16,26 @@ class LWE_Encrypt():
         max_additional_error = (self.q // 4) - self.max_error - 1
         max_equation_weights = max_additional_error // self.max_error
         max_extra_errors = max_additional_error % self.max_error
+        if max_equation_weights <= 1:
+            raise Exception("Entropy of public Key is too small. Please increase the size of q")
+        # print(f"max_additional_error = {max_additional_error}\nmax_equation_weights = {max_equation_weights}\nmax_extra_errors = {max_extra_errors}")
 
         # Calculate equation & extra error freedom
         A_indexes = [secrets.randbelow(len(self.A_list)) for _ in range(max_equation_weights)]
         
-        # TODO Increase Entropy here
+        # Do weighted addition of equations
         A_new = (self.A_list[A_indexes[0]] + self.A_list[A_indexes[1]]) % self.q
         T_new = (self.T_list[A_indexes[0]] + self.T_list[A_indexes[1]]) % self.q
+        for i in range(2, len(A_indexes)):
+            A_new = (A_new + self.A_list[A_indexes[i]]) % self.q
+            T_new = (T_new + self.T_list[A_indexes[i]]) % self.q
+        
+        # Add extra errors
+        if max_extra_errors > 1:
+            E_extra_mags = secrets.randbelow(max_extra_errors)
+            E_extra_signs = (secrets.randbelow(2) * 2) - 1   # Generates +1 and -1
+            E_extra = (E_extra_mags * E_extra_signs) % self.q  # Multiplies the sign to the errors
+            T_new = (T_new + E_extra) % self.q
 
         # Add Message
         new_message = message * (self.q // 2)
@@ -47,11 +60,10 @@ class LWE_Decrypt():
     def __init__(self, n: int, q=13, max_error=1, list_size=5, secret=None) -> None:
         """
         Parameters:
-        n: Length of equations used to encrypt each bit
+        n: Length of equations used to encrypt each bit (Also length of secret)
         max_error: The maximum magnitude of error to be introduced while creating the public keys
-        list_size: The number of valid 
+        list_size: The number of valid A & T pairs to send as public key
         q: Base divisor for number space (All numbers will be mod q)
-        phi_x: Base polynomial for the Space (If None will become x^n + 1)
         secret: Secret Key to be used (If None will be randomly generated)
         """
         if max_error > (q//8):
@@ -85,7 +97,7 @@ class LWE_Decrypt():
             T_with_errors = (T_no_errors + E_final) % self.q
             
             # Store the T_list for future use
-            self.T_list = T_with_errors
+            self.T_list = np.array(T_with_errors)
         
         return self.A_list, self.T_list, self.q, self.max_error
     
@@ -110,15 +122,15 @@ class LWE_Decrypt():
 
 
 if __name__ == "__main__":
-    rlwe_d = LWE_Decrypt(5, q=17, max_error=1, list_size=12)
-    MESSAGE = [1, 0, 1]
+    lwe_d = LWE_Decrypt(n=5, q=109, max_error=4, list_size=12)
+    MESSAGE = [1, 1, 0]
     print(f"message = {MESSAGE}")
     # Get public keys
-    A_list, T_list, q, max_error = rlwe_d.get_public_keys()
+    A_list, T_list, q, max_error = lwe_d.get_public_keys()
     # Encrypt Message
-    rlwe_e = LWE_Encrypt(A_list, T_list, q, max_error)
-    A_new, T_send = rlwe_e.encrypt_message(MESSAGE)
+    lwe_e = LWE_Encrypt(A_list, T_list, q, max_error)
+    A_new, T_send = lwe_e.encrypt_message(MESSAGE)
     print(f"A_new = {A_new}\nT_send = {T_send}")
     # Decrypt Message
-    decrypted_message = rlwe_d.decrypt_message(A_new, T_send)
+    decrypted_message = lwe_d.decrypt_message(A_new, T_send)
     print(f"decrypted_message = {decrypted_message}")
