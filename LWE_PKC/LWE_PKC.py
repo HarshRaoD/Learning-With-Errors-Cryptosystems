@@ -30,6 +30,17 @@ class LWE_Encrypt():
 
         return A_new, T_send
     
+    def encrypt_message(self, message: list):
+        """message must be a list of single bits."""
+        A_new_list = []
+        T_send_list = []
+        for bit in message:
+            A_new, T_send = self.encrypt_bit(bit)
+            A_new_list.append(A_new)
+            T_send_list.append(T_send)
+        
+        return A_new_list, T_send_list
+    
 
 class LWE_Decrypt():
     """Performs the setup and decryption of LWE Public Key Encryption Scheme"""
@@ -89,18 +100,25 @@ class LWE_Decrypt():
         final_message = ((Message_Draft + (self.q//4)) % self.q) // (self.q//2)
 
         return final_message
+    
+    def decrypt_message(self, A_new_list, T_sent_list):
+        final_message = []
+        for i in range(len(T_sent_list)):
+            final_message.append(self.decrypt_bit(A_new_list[i], T_sent_list[i]))
+        
+        return final_message
 
 
 if __name__ == "__main__":
-    rlwe_d = LWE_Decrypt(5, q=17, max_error=1)
-    MESSAGE = 1
+    rlwe_d = LWE_Decrypt(5, q=17, max_error=1, list_size=12)
+    MESSAGE = [1, 0, 1]
     print(f"message = {MESSAGE}")
     # Get public keys
     A_list, T_list, q, max_error = rlwe_d.get_public_keys()
     # Encrypt Message
     rlwe_e = LWE_Encrypt(A_list, T_list, q, max_error)
-    A_new, T_send = rlwe_e.encrypt_bit(MESSAGE)
+    A_new, T_send = rlwe_e.encrypt_message(MESSAGE)
     print(f"A_new = {A_new}\nT_send = {T_send}")
     # Decrypt Message
-    decrypted_message = rlwe_d.decrypt_bit(A_new, T_send)
+    decrypted_message = rlwe_d.decrypt_message(A_new, T_send)
     print(f"decrypted_message = {decrypted_message}")
