@@ -52,14 +52,27 @@ class RLWE_Encrypt():
             raise Exception(f"Message is too long for this scheme. Message Length must be {self.n}")
         elif len(message) < self.n:
             raise Exception(f"Message is too short for this scheme. Message Length must be {self.n}")
-    
-        # TODO Have more complicated entropy later (Right now just adding two equations)
-        
-        i1 = secrets.randbelow(len(self.A_list))
-        i2 = secrets.randbelow(len(self.A_list))
 
-        A_new = np.polyadd(self.A_list[i1], self.A_list[i2]) % self.q
-        T_new = np.polyadd(self.T_list[i1], self.T_list[i2]) % self.q
+        # Find max_additional_error
+        max_additional_error = (self.q // 4) - self.max_error - 1
+        max_equation_weights = max_additional_error // self.max_error
+        max_extra_errors = max_additional_error % self.max_error
+
+        # Calculate equation & extra error freedom
+        A_indexes = [secrets.randbelow(len(self.A_list)) for _ in range(max_equation_weights)]
+        
+        # Do weighted addition of equations
+        A_new = np.polyadd(self.A_list[0], self.A_list[1]) % self.q
+        T_new = np.polyadd(self.T_list[0], self.T_list[1]) % self.q
+        for i in range(2, len(A_indexes)):
+            A_new = np.polyadd(A_new, self.A_list[A_indexes[i]]) % self.q
+            T_new = np.polyadd(T_new, self.T_list[A_indexes[i]]) % self.q
+
+        # Add extra errors
+        if max_extra_errors > 0:
+            E_extra = np.array([secrets.randbelow(max_extra_errors) for _ in range(self.n)]) % self.q
+            T_new = np.polyadd(T_new, E_extra) % self.q
+            T_new = np.polydiv(T_new, self.phi_x)[1] % self.q
 
         # Add message
         new_message = [(self.q // 2) * m for m in message]
@@ -69,7 +82,7 @@ class RLWE_Encrypt():
 
 class RLWE_Decrypt():
     """Performs the setup and decryption of RLWE Public Key Encryption Scheme"""
-    def __init__(self, message_length: int, q=13, max_error=1, list_size=2, phi_x=None, secret=None) -> None:
+    def __init__(self, message_length: int, q=13, max_error=1, list_size=5, phi_x=None, secret=None) -> None:
         """
         Parameters:
         message_length: Length of message to be sent
@@ -79,8 +92,8 @@ class RLWE_Decrypt():
         phi_x: Base polynomial for the Space (If None will become x^n + 1)
         secret: Secret Key to be used (If None will be randomly generated)
         """
-        if max_error >= (q//4):
-            raise Exception(f"max_error ({max_error}) cannot exceed q//4 ({q//4})")
+        if max_error > (q//8):
+            raise Exception(f"max_error ({max_error}) cannot exceed q//8 ({q//8})")
         self.n = message_length
         self.q = q
         self.max_error = max_error
@@ -149,8 +162,8 @@ class RLWE_Decrypt():
     
 
 if __name__ == "__main__":
-    rlwe_d = RLWE_Decrypt(4)
-    MESSAGE = [1, 0, 1, 1]
+    rlwe_d = RLWE_Decrypt(4, q=105, max_error=4)
+    MESSAGE = [0, 0, 1, 1]
     print(f"message = {MESSAGE}")
     # Get public keys
     A_list, T_list, phi_x, q, max_error = rlwe_d.get_public_keys()
