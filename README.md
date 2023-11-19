@@ -8,8 +8,7 @@ OneDrive Link: https://entuedu-my.sharepoint.com/:f:/g/personal/harshrao001_e_nt
     2. Maybe time complexity graphs
 3. Introduce RLWE (Ring LWE) and MLWE (Module RWE) - Theory
     1. https://summerschool-croatia.cs.ru.nl/2018/slides/Introduction%20to%20post-quantum%20cryptography%20and%20learning%20with%20errors.pdf 
-4. Implement key exchange algorithm using RLWE - Code
-    1. https://www.youtube.com/watch?v=hN5TQiz2gWs 
+4. Public Key Crypto algorithm using RLWE - Code
 5. Homomorphicity of RLWE using BGV - Code
     1. https://asecuritysite.com/homomorphic/bgv 
     2. https://github.com/shibataka000/BGV/tree/master 
