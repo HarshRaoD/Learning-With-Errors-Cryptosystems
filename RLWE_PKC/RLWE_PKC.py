@@ -4,7 +4,7 @@ import secrets
 # Check for correct numpy version
 np_version = np.version.version
 if np_version[:-2] != '1.24':
-    print(f"WARNING: NumPy version! Please use NumPy version 1.24.x for the best experience. Use of an incorrect numpy version could cause the printing of polynomials to work differently. As the expected order of polynomial coefficients was changed. In this implementation we expect the order to be highest to lowest degree.")
+    print(f"WARNING: NumPy version! Please use NumPy version 1.24.x for the best experience. Use of an incorrect numpy version may cause the printing of polynomials to work differently. As the expected order of polynomial coefficients was changed in prior versions. In this implementation we expect the order to be highest to lowest degree.")
 
 def poly_to_str(p) -> str:
     """Converts polynomial to string.  
@@ -28,9 +28,11 @@ def poly_to_str(p) -> str:
     # Reverse back
     p_stack = p_stack[::-1]
     # Get final output
+    first_thing = True
     for i in range(len(p_stack)):
         if len(p_stack[i]) > 0:
-            final_str += (" + " if i != 0 else "") + p_stack[i]
+            final_str += (" + " if not first_thing else "") + p_stack[i]
+            first_thing = False
         
     return final_str
 
@@ -146,4 +148,17 @@ class RLWE_Decrypt():
         return final_message
     
 
+if __name__ == "__main__":
+    rlwe_d = RLWE_Decrypt(4)
+    MESSAGE = [1, 0, 1, 1]
+    print(f"message = {MESSAGE}")
+    # Get public keys
+    A_list, T_list, phi_x, q, max_error = rlwe_d.get_public_keys()
+    # Encrypt Message
+    rlwe_e = RLWE_Encrypt(A_list, T_list, phi_x, q, max_error)
+    A_new, T_send = rlwe_e.encrypt_message(MESSAGE)
+    print(f"A_new = {poly_to_str(A_new)}\nT_send = {poly_to_str(T_send)}")
+    # Decrypt Message
+    decrypted_message = rlwe_d.decrypt_message(A_new, T_send)
+    print(f"decrypted_message = {decrypted_message}")
 
