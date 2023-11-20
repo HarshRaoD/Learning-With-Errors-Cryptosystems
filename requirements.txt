@@ -1,0 +1,5 @@
+mkl-service==2.4.0
+numpy==1.26.0
+pip==23.3
+setuptools==68.0.0
+wheel==0.41.2
