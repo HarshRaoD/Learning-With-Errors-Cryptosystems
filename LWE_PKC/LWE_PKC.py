@@ -1,5 +1,5 @@
-import numpy as np
 import secrets
+import numpy as np
 
 class LWE_Encrypt():
     """Performs encryption using LWE Public Key Encryption Scheme"""
@@ -16,6 +16,7 @@ class LWE_Encrypt():
         max_additional_error = (self.q // 4) - self.max_error - 1
         max_equation_weights = max_additional_error // self.max_error
         max_extra_errors = max_additional_error % self.max_error
+
         if max_equation_weights <= 1:
             raise Exception("Entropy of public Key is too small. Please increase the size of q")
         # print(f"max_additional_error = {max_additional_error}\nmax_equation_weights = {max_equation_weights}\nmax_extra_errors = {max_extra_errors}")
@@ -47,6 +48,7 @@ class LWE_Encrypt():
         """message must be a list of single bits."""
         A_new_list = []
         T_send_list = []
+        
         for bit in message:
             A_new, T_send = self.encrypt_bit(bit)
             A_new_list.append(A_new)

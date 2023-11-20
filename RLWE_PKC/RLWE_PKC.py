@@ -1,5 +1,5 @@
-import numpy as np
 import secrets
+import numpy as np
 
 # Check for correct numpy version
 np_version = np.version.version
