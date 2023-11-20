@@ -39,9 +39,9 @@ def poly_to_str(p) -> str:
 class RLWE_Encrypt():
     """Performs encryption using RLWE Public Key Encryption Scheme"""
     def __init__(self, A_list, T_list, phi_x, q, max_error):
-        self.A_list = A_list
-        self.T_list = T_list
-        self.phi_x = phi_x
+        self.A_list = np.array(A_list)
+        self.T_list = np.array(T_list)
+        self.phi_x = np.array(phi_x)
         self.q = q
         self.max_error = max_error
         self.n = len(A_list[0])
@@ -87,7 +87,7 @@ class RLWE_Decrypt():
         Parameters:
         message_length: Length of message to be sent
         max_error: The maximum magnitude of error to be introduced while creating the public keys
-        list_size: The number of valid 
+        list_size: The number of valid A and T pairs to send as public key
         q: Base divisor for number space (All numbers will be mod q)
         phi_x: Base polynomial for the Space (If None will become x^n + 1)
         secret: Secret Key to be used (If None will be randomly generated)
@@ -113,7 +113,7 @@ class RLWE_Decrypt():
         for i in range(list_size):
             A = [secrets.randbelow(self.q) for _ in range(self.n)]
             A_list.append(A)
-        self.A_list = A_list
+        self.A_list = np.array(A_list)
         self.T_list = None  # Will be calculated at time of sending public key (and stored)
     
     def _calculate_T(self, A, E):
@@ -141,7 +141,7 @@ class RLWE_Decrypt():
                 T = self._calculate_T(self.A_list[i], E_final)
                 T_list.append(T)
             # Store the T_list for future use
-            self.T_list = T_list
+            self.T_list = np.array(T_list)
         
         return self.A_list, self.T_list, self.phi_x, self.q, self.max_error
     
