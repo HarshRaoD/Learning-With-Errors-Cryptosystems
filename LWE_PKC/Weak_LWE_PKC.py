@@ -1,5 +1,6 @@
 import secrets
 import numpy as np
+import math
 
 class LWE_Encrypt():
     """Performs encryption using LWE Public Key Encryption Scheme"""
@@ -57,8 +58,8 @@ class LWE_Encrypt():
         return A_new_list, T_send_list
     
 
-class LWE_Decrypt():
-    """Performs the setup and decryption of LWE Public Key Encryption Scheme"""
+class LWE_Decrypt_Weak():
+    """Weak System with less entropy of a and s"""
     def __init__(self, n: int, q=13, max_error=1, list_size=5, secret=None) -> None:
         """
         Parameters:
@@ -75,16 +76,20 @@ class LWE_Decrypt():
         self.max_error = max_error
         # Handle Secret
         if secret is None:
-            self.secret = [secrets.randbelow(self.q) for _ in range(self.n)]
+            self.secret = [secrets.randbelow(int(math.sqrt(self.q) // 2)) for _ in range(self.n)]
+            secret_signs = [(secrets.randbelow(2) * 2) - 1 for _ in range(self.n)]  # Generates +1 and -1
+            self.secret = np.array([self.secret[i] * secret_signs[i] for i in range(self.n)]) % q
         else:
             self.secret = secret
 
         # Generate A_list
         A_list = []
         for _i in range(list_size):
-            A = [secrets.randbelow(self.q) for _ in range(self.n)]
+            A = [secrets.randbelow(int(math.sqrt(self.q) // 2)) for _ in range(self.n)]
+            A_signs = [(secrets.randbelow(2) * 2) - 1 for _ in range(self.n)]  # Generates +1 and -1
+            A = [A[i] * A_signs[i] for i in range(self.n)]
             A_list.append(A)
-        self.A_list = np.array(A_list)
+        self.A_list = np.array(A_list) % self.q
         self.T_list = None  # Will be calculated at time of sending public key (and stored)
     
     def get_public_keys(self):
