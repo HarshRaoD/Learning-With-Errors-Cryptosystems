@@ -46,15 +46,17 @@ class RLWE_Encrypt():
         self.max_error = max_error
         self.n = len(A_list[0])
     
-    def encrypt_message(self, message: list):
-        """message must be in a form of a list of bits and be of the exact length needed."""
+    def encrypt_message(self, message: list, max_additional_error = None):
+        """ Parameters: 
+        message: list of bits and be of the exact length needed.
+        max_additional_error: the amount of additional error that will be introduced during public key encryption (if None program will calculate the max value)"""
         if len(message) > self.n:
             raise Exception(f"Message is too long for this scheme. Message Length must be {self.n}")
         elif len(message) < self.n:
             raise Exception(f"Message is too short for this scheme. Message Length must be {self.n}")
 
         # Find max_additional_error
-        max_additional_error = (self.q // 4) - self.max_error - 1
+        max_additional_error = ((self.q // 4) - self.max_error - 1) if max_additional_error is None else max_additional_error
         max_equation_weights = max_additional_error // self.max_error
         max_extra_errors = max_additional_error % self.max_error
 
@@ -62,8 +64,8 @@ class RLWE_Encrypt():
         A_indexes = [secrets.randbelow(len(self.A_list)) for _ in range(max_equation_weights)]
         
         # Do weighted addition of equations
-        A_new = np.polyadd(self.A_list[0], self.A_list[1]) % self.q
-        T_new = np.polyadd(self.T_list[0], self.T_list[1]) % self.q
+        A_new = np.polyadd(self.A_list[A_indexes[0]], self.A_list[A_indexes[1]]) % self.q
+        T_new = np.polyadd(self.T_list[A_indexes[0]], self.T_list[A_indexes[1]]) % self.q
         for i in range(2, len(A_indexes)):
             A_new = np.polyadd(A_new, self.A_list[A_indexes[i]]) % self.q
             T_new = np.polyadd(T_new, self.T_list[A_indexes[i]]) % self.q
