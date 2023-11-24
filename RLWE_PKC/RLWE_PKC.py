@@ -136,9 +136,7 @@ class RLWE_Decrypt():
             T_list = []
             for i in range(len(self.A_list)):
                 # Generate Es
-                E_mags = [secrets.randbelow(self.max_error + 1) for _ in range(self.n)]
-                E_signs = [(secrets.randbelow(2) * 2) - 1 for _ in range(self.n)]  # Generates +1 and -1
-                E_final = [(E_mags[i] * E_signs[i]) % self.q for i in range(self.n)]  # Multiplies the sign to the errors
+                E_final = np.array([secrets.randbelow(self.max_error * 2) - self.max_error for _ in range(len(self.A_list))])
 
                 T = self._calculate_T(self.A_list[i], E_final)
                 T_list.append(T)

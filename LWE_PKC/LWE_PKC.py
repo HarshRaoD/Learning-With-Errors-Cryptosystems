@@ -91,9 +91,7 @@ class LWE_Decrypt():
         if self.T_list is None:
             # Calculate T_list
             # Generate Es
-            E_mags = [secrets.randbelow(self.max_error + 1) for _ in range(len(self.A_list))]
-            E_signs = [(secrets.randbelow(2) * 2) - 1 for _ in range(len(self.A_list))]  # Generates +1 and -1
-            E_final = np.array([(E_mags[i] * E_signs[i]) % self.q for i in range(len(self.A_list))])  # Multiplies the sign to the errors
+            E_final = np.array([secrets.randbelow(self.max_error * 2) - self.max_error for _ in range(len(self.A_list))])
 
             T_no_errors = np.matmul(self.A_list, self.secret) % self.q
             T_with_errors = (T_no_errors + E_final) % self.q
