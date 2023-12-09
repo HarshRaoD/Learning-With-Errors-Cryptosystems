@@ -26,7 +26,7 @@ This repo contains:
 
 ## Presentation Link
 The presentation can be viewed:   
-1. PDF -> (here) 
+1. PDF -> [(here)](https://github.com/HarshRaoD/Applied-Cryptography-Project/blob/main/Learning_With_Errors.pdf) 
 2. PowerPoint Presentation -> [(here)](https://entuedu-my.sharepoint.com/:p:/g/personal/harshrao001_e_ntu_edu_sg/EXBONLFc4klHqWMUNiM3QMsB7JF96xFM6ahDaq0gO5UxDA?e=XQvLEF)
 
 ## Authors
