@@ -38,3 +38,12 @@ The presentation can be viewed:
 2. Enter the same virtual environment
 3. ```pip install -r requirements.txt```
 4. You can then run ```python RLWE_PKC/RLWE_PKC.py```
+
+## Bibliography
+1. [Intro to post quantum cryptography & learning with errors by Douglas Stebila](https://summerschool-croatia.cs.ru.nl/2018/slides/Introduction%20to%20post-quantum%20cryptography%20and%20learning%20with%20errors.pdf)
+2. [Fully Homomorphic Encryption without Bootstrapping by Zvika Brakerski et al](https://eprint.iacr.org/2011/277.pdf)
+3. [Key Recovery for LWE in Polynomial Time by Kim Laine et al](https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/LWEattackPreprint.pdf)
+4. [The Learning with Errors Problem by Oded Regev](https://cims.nyu.edu/~regev/papers/lwesurvey.pdf)
+5. [Crypto Attacks by Joachim Vandersmissen](https://github.com/jvdsn/crypto-attacks/blob/master/attacks/lwe/arora_ge.py)
+6. [The Learning with Errors Problem: Algorithms](https://people.csail.mit.edu/vinodv/CS294/lecture2.pdf)
+7. [New Algorithms for Learning in Presence of Errors by Sanjeev Arora & Rong Ge](https://users.cs.duke.edu/~rongge/LPSN.pdf)
